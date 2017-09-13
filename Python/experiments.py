@@ -14,52 +14,53 @@ from envs.windy_gridworld import WindyGridworldEnv
 from envs.cliff_walking import CliffWalkingEnv
 
 if __name__ == "__main__":    
-
     # set seed for reproducibility
     np.random.seed(13092017)
     # Experiments Mountain Car
     env = gym.make("MountainCar-v0").env
     
     # Test values: Parameters
-    n_episodes = 100
-    alpha = 0.1 # [0.1, 0.5]
+    n_episodes = 500
+    alphas = [0.1] # [0.1, 0.5]
     epsilon = 0.1
-    n_runs = 1
+    n_runs = 10
     beta = 0 # [0, 1]
     lambdas = [0, 0.5, 0.9]
     sigmas = [0, 0.5, 1]
     
-    param_comb = len(sigmas) * len(lambdas)
+    param_comb = len(sigmas) * len(lambdas) * len(alphas)
     rows = n_episodes * n_runs * param_comb
     cols = 9
     df = np.zeros((rows, cols))
     
     for Lambda in range(len(lambdas)):
-        print("Lambda:" + str(Lambda))
+        print("Lambda:" + str(lambdas[Lambda]))
         for sigma in range(len(sigmas)):
-            print("Sigma:" + str(sigma))
-            param_comb = Lambda * len(sigmas) + sigma
-            for run in range(n_runs):
-                _, steps, rewards = qSigmaLambdaMC(env, Lambda = lambdas[Lambda], 
-                                                   sigma = sigmas[sigma], 
-                                                   n_episodes = n_episodes, 
-                                                   alpha = alpha, 
-                                                   epsilon = epsilon, 
-                                                   beta = beta)
-                index = Lambda * len(sigmas) * n_runs + sigma * n_runs + run
-                # print(index)
-                start = index * n_episodes
-                end = index * n_episodes + n_episodes
-                # print(index_range)
-                df[start:end, 0] = param_comb
-                df[start:end, 1] = alpha
-                df[start:end, 2] = beta
-                df[start:end, 3] = lambdas[Lambda]
-                df[start:end, 4] = sigmas[sigma]
-                df[start:end, 5] = run
-                df[start:end, 6] = np.arange(n_episodes)
-                df[start:end, 7] = steps
-                df[start:end, 8] = rewards
+            print("Sigma:" + str(sigmas[sigma]))
+            for alpha in range(len(alphas)):
+                print("Alpha:" + str(alphas[alpha]))
+                param_comb = Lambda * len(sigmas) * len(alphas) + sigma * len(alphas) + alpha
+                for run in range(n_runs):
+                    _, steps, rewards = qSigmaLambdaMC(env, Lambda = lambdas[Lambda], 
+                                                       sigma = sigmas[sigma], 
+                                                       n_episodes = n_episodes, 
+                                                       alpha = alphas[alpha], 
+                                                       epsilon = epsilon, 
+                                                       beta = beta)
+                    # get index of which row to fill
+                    index = Lambda * len(sigmas) * len(alphas) * n_runs + sigma * len(alphas) * n_runs + alpha * n_runs + run
+                    # print(index)
+                    start = index * n_episodes
+                    end = index * n_episodes + n_episodes
+                    df[start:end, 0] = param_comb
+                    df[start:end, 1] = alphas[alpha]
+                    df[start:end, 2] = beta
+                    df[start:end, 3] = lambdas[Lambda]
+                    df[start:end, 4] = sigmas[sigma]
+                    df[start:end, 5] = run
+                    df[start:end, 6] = np.arange(n_episodes)
+                    df[start:end, 7] = steps
+                    df[start:end, 8] = rewards
     
     df = pd.DataFrame(df)
     df.columns = ['param_comb', 'alpha', "beta", "Lambda", "sigma", "run", 
