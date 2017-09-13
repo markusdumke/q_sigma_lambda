@@ -260,7 +260,7 @@ def qSigmaLambdaMC(env,  n_episodes = 100, Lambda = 0, sigma = 1,
             E[active_tiles] = E[active_tiles] * (1 - beta) + 1
             
             # update weights
-            weights[active_tiles] += alpha * E * td_error
+            weights += alpha * E * td_error
             
             # reduce eligibility for all weights
             E = gamma * Lambda * E * (sigma + policy[a_n] * (1 - sigma))
