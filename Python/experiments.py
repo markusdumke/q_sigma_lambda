@@ -7,23 +7,24 @@ import numpy as np
 import pandas as pd
 import os
 
-os.getcwd()
 os.chdir("C:/Users/M/Desktop/q_sigma_lambda/Python")
 
-from q_sigma_lambda import qSigmaLambda, qSigmaLambdaMC, running_mean
+from q_sigma_lambda import qSigmaLambda, qSigmaLambdaMC
 from envs.windy_gridworld import WindyGridworldEnv
 from envs.cliff_walking import CliffWalkingEnv
 
 if __name__ == "__main__":    
 
+    # set seed for reproducibility
+    np.random.seed(13092017)
     # Experiments Mountain Car
-    env = gym.make("MountainCar-v0")
+    env = gym.make("MountainCar-v0").env
     
     # Test values: Parameters
-    n_episodes = 3
+    n_episodes = 100
     alpha = 0.1 # [0.1, 0.5]
     epsilon = 0.1
-    n_runs = 2
+    n_runs = 1
     beta = 0 # [0, 1]
     lambdas = [0, 0.5, 0.9]
     sigmas = [0, 0.5, 1]
@@ -57,12 +58,14 @@ if __name__ == "__main__":
                 df[start:end, 4] = sigmas[sigma]
                 df[start:end, 5] = run
                 df[start:end, 6] = np.arange(n_episodes)
-                # df[start:end, 7] = steps
-                # df[start:end, 8] = rewards
+                df[start:end, 7] = steps
+                df[start:end, 8] = rewards
     
     df = pd.DataFrame(df)
     df.columns = ['param_comb', 'alpha', "beta", "Lambda", "sigma", "run", 
                   "episode", "steps", "reward"]
+    df.head(10)
+    df.to_csv("mountaincar.csv")
     np.save("mountaincar.npy", df)
     
     
