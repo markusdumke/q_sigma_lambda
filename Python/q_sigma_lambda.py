@@ -132,7 +132,7 @@ def qSigmaLambda(env, n_episodes = 100, Lambda = 0, sigma = 1, beta = 0,
             
             # update Q for all states based on their eligibility
             Q += alpha * E * td_error
-            E = gamma * Lambda * E * (sigma + policy[a_n] * (1 - sigma))
+            E *= gamma * Lambda * (sigma + policy[a_n] * (1 - sigma))
             
             # set s to s_n, a to a_n
             s = s_n
@@ -162,6 +162,7 @@ POSITION_MAX = 0.5
 VELOCITY_MIN = - 0.07
 VELOCITY_MAX = 0.07
 
+# get action values
 def getValue(state, weights, hash_table, n_tilings):
     Q = np.zeros(3)
     # for each action
@@ -171,6 +172,7 @@ def getValue(state, weights, hash_table, n_tilings):
         Q[i] = np.sum(weights[active_tiles])
     return Q
 
+# preprocess state: scale position and velocity
 def preprocessState(state, n_tilings):
     position = state[0]
     velocity = state[1]
@@ -181,22 +183,24 @@ def preprocessState(state, n_tilings):
     velocity = velocity_scale * velocity #- VELOCITY_MIN)
     return np.array((position, velocity))
 
+# get active tile for each tiling
 def getActiveTiles(position, velocity, action, hash_table, n_tilings):
     active_tiles = tilecoding.tiles(hash_table, n_tilings, 
                                     [position, velocity], [action])
     return active_tiles
 
 # get number of steps to reach the goal under current state value function
-def costToGo(state):
+def costToGo(state, weights, hash_table, n_tilings):
     costs = []
     for action in ACTIONS:
-        costs.append(getValue(state, action))
+        costs.append(getValue(state, weights, hash_table, n_tilings))
     return - np.max(costs)
 
 def qSigmaLambdaMC(env,  n_episodes = 100, Lambda = 0, sigma = 1, 
                    beta = 0, epsilon = 0.1, alpha = 0.1, gamma = 1, 
                    target_policy = "greedy", printing = False, 
-                   cliff = False, n_tilings = 8, max_size = 4096): 
+                   cliff = False, n_tilings = 8, max_size = 4096, render = False,
+                   update_sigma = 1, update_lambda = 1, update_alpha = 1): 
     
     # adjust learning rate to number of tilings
     alpha = alpha / n_tilings
@@ -207,7 +211,7 @@ def qSigmaLambdaMC(env,  n_episodes = 100, Lambda = 0, sigma = 1,
     weights = np.zeros(max_size)
     episode_steps = np.zeros(n_episodes)
     rewards = np.zeros(n_episodes)
-        
+    
     for i in range(n_episodes):
         done = False
         j = 0
@@ -228,11 +232,13 @@ def qSigmaLambdaMC(env,  n_episodes = 100, Lambda = 0, sigma = 1,
         while done == False:
             j += 1
             # take action, observe next state and reward
+            if render:
+                env.render()
             s_n, r, done, _ = env.step(a)
             
             # only for Mountain Cliff, negative reward of -100 when falling of the cliff
             if cliff:
-                if s_n <= POSITION_MIN:
+                if s_n[0] <= POSITION_MIN:
                     s_n = env.reset()
                     r = - 100
                     
@@ -260,10 +266,14 @@ def qSigmaLambdaMC(env,  n_episodes = 100, Lambda = 0, sigma = 1,
             E[active_tiles] = E[active_tiles] * (1 - beta) + 1
             
             # update weights
+            # print(alpha * E * td_error)
+            if any(np.isnan(alpha * E * td_error)):
+                print("NaN encountered, probably due to high learning rate alpha.")
+                break
             weights += alpha * E * td_error
             
             # reduce eligibility for all weights
-            E = gamma * Lambda * E * (sigma + policy[a_n] * (1 - sigma))
+            E *= gamma * Lambda * (sigma + policy[a_n] * (1 - sigma))
             
             # set s to s_n, a to a_n, Q to Q_n
             s = s_n
@@ -277,23 +287,8 @@ def qSigmaLambdaMC(env,  n_episodes = 100, Lambda = 0, sigma = 1,
                           str(reward_sum) + " rewards.")
                 episode_steps[i] = j
                 rewards[i] = reward_sum
+                sigma *= update_sigma
+                Lambda *= update_lambda
+                alpha *= update_alpha
                 break
     return weights, episode_steps, rewards
-
-def running_mean(x, n):
-    """
-    Compute running mean.
-    
-    Parameters
-    ----------
-    x: numpy array or list
-        The values to compute the mean of.
-    n: int
-        Window size of running mean.
-    
-    Return
-    ------
-    The running mean of x, a numpy array.
-    """
-    cumsum = np.cumsum(np.insert(x, 0, 0)) 
-    return (cumsum[n:] - cumsum[:-n]) / n 
