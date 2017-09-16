@@ -63,7 +63,7 @@ def plot(df, x_var = "episode", y_var = "steps",  col_var = "Lambda", ls_var = "
          linestyles = ['-', "--", ":"],
          file = "a.pdf", window = 1, ylim = [0, 500], xlim = [0, 200], 
          title = "", xlabel = "Episode", ylabel = "Steps per Episode",
-         legend_pos_col = 1, legend_pos_ls = 9):
+         legend_pos_col = 1, legend_pos_ls = 9, legend2 = True):
 
     # get unique values of color var and linestyle var
     col = np.unique(df[col_var]) 
@@ -97,11 +97,12 @@ def plot(df, x_var = "episode", y_var = "steps",  col_var = "Lambda", ls_var = "
     legend1 = plt.legend([dummy_lines_col[i] for i in range(len(dummy_lines_col))], 
                           ["%.2f" % number for number in col], 
                           loc = legend_pos_col, title = col_var)
-    legend2 = plt.legend([dummy_lines_ls[i] for i in range(len(dummy_lines_ls))], 
-                          ["%.2f" % number for number in ls], 
-                          loc = legend_pos_ls, title = ls_var)
     axes.add_artist(legend1)
-    axes.add_artist(legend2)
+    if legend2:
+        legend2 = plt.legend([dummy_lines_ls[i] for i in range(len(dummy_lines_ls))], 
+                              ["%.2f" % number for number in ls], 
+                              loc = legend_pos_ls, title = ls_var)
+        axes.add_artist(legend2)
 
     # If window size > 1: 
     # change x axis ticks labels to an interval of data included in the window

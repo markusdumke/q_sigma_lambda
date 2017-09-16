@@ -10,13 +10,11 @@ from q_sigma_lambda import qSigmaLambda, qSigmaLambdaMC
 from envs.windy_gridworld import WindyGridworldEnv
 from envs.cliff_walking import CliffWalkingEnv
 
-""" 
-============
-Mountain Car 
-============
-"""
+#==============================================================================
 # set seed for reproducibility
 np.random.seed(13092017)
+
+""" Mountain Car """
 
 # we need gym.make().env to prevent the time step limit of 200 steps
 env = gym.make("MountainCar-v0").env
@@ -52,6 +50,9 @@ plot(df, window = 50, title = "Mountain Car", file = "mountaincar2.pdf",
 # df3.to_latex()
 # 
 #==============================================================================
+
+""" Windy Gridworld """
+
 env = WindyGridworldEnv()
 df = simulate(env, algorithm = qSigmaLambda, n_episodes = 200, n_runs = 10, 
               epsilon = 0.1, gamma = 1, alphas = [0.5], betas = [0, 0.5, 1], 
@@ -63,15 +64,17 @@ plot(df, window = 10, title = "Windy Gridworld", file = "windygridworld.pdf",
      xlim = [0, 20], ylim = [0, 200])
 
 #==============================================================================
+
+""" Cliff Walking """
+
 env = CliffWalkingEnv()
-df = simulate(env, algorithm = qSigmaLambda, n_episodes = 300, n_runs = 100, 
-              epsilon = 0.1, gamma = 1, alphas = [0.5], betas = [0, 1], 
-              lambdas = [0.5], sigmas = [0, 0.5, 1])
-df.to_csv("cliffwalking2.csv")
+df = simulate(env, algorithm = qSigmaLambda, n_episodes = 300, n_runs = 1000, 
+              epsilon = 0.1, gamma = 1, alphas = [0.5], betas = [0], 
+              lambdas = [0], sigmas = [0, 0.5, 1])
+df.to_csv("cliffwalking1000.csv")
 df = df.groupby(['param_comb', 'alpha', "beta", "Lambda", "sigma", "episode"], as_index = False)['steps', "reward"].mean()
-plot(df, window = 50, title = "Cliff Walking", file = "cliffwalking2.pdf", 
-     col_var = "sigma", ls_var = "beta",
-     xlim = [0, 300], ylim = [- 80, 0], y_var = "reward")
 
-
+plot(df, window = 10, title = "Cliff Walking", file = "cliffwalking3.pdf", 
+     col_var = "sigma", ls_var = "beta", ylabel = "Return per Episode", 
+     xlim = [0, 300], ylim = [- 80, - 10], y_var = "reward", legend_pos_col = 4, legend2 = False)
 
