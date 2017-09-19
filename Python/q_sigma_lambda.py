@@ -48,7 +48,8 @@ Tabular Q(sigma, lambda)
 """
 def qSigmaLambda(env, n_episodes = 100, Lambda = 0, sigma = 1, beta = 0, 
                  epsilon = 0.1, alpha = 0.1, gamma = 1, 
-                 target_policy = "greedy", printing = False):  
+                 target_policy = "greedy", printing = False, 
+                 update_sigma = 1, update_lambda = 1, update_alpha = 1):  
     """
     Value-based reinforcement learning control algorithm.
     Subsumes Sarsa, Expected Sarsa, Q-Learning.
@@ -94,9 +95,12 @@ def qSigmaLambda(env, n_episodes = 100, Lambda = 0, sigma = 1, beta = 0,
 
     Q = np.zeros((env.observation_space.n, env.action_space.n))
     episode_steps = np.zeros(n_episodes)
-    rewards = np.zeros(n_episodes)
-        
+    returns = np.zeros(n_episodes)
+    nan = False
+    
     for i in range(n_episodes):
+        if nan:
+            break
         done = False
         j = 0
         reward_sum = 0
@@ -131,6 +135,12 @@ def qSigmaLambda(env, n_episodes = 100, Lambda = 0, sigma = 1, beta = 0,
             E[s, a] = E[s, a] * (1 - beta) + 1
             
             # update Q for all states based on their eligibility
+            if np.any(np.isnan(alpha * E * td_error)):
+                print("NaN encountered, probably due to high learning rate alpha.")
+                returns = np.repeat(- 1000000, n_episodes)
+                episode_steps = np.repeat(1000000, n_episodes)
+                nan = True
+                break
             Q += alpha * E * td_error
             E *= gamma * Lambda * (sigma + policy[a_n] * (1 - sigma))
             
@@ -142,11 +152,14 @@ def qSigmaLambda(env, n_episodes = 100, Lambda = 0, sigma = 1, beta = 0,
                 if printing:
                     print("Episode " + str(i + 1) + " finished after " + 
                           str(j + 1) + " time steps " + "obtaining " + 
-                          str(reward_sum) + " rewards.")                    
+                          str(reward_sum) + " returns.")                    
                 episode_steps[i] = j
-                rewards[i] = reward_sum
+                returns[i] = reward_sum
+                sigma *= update_sigma
+                Lambda *= update_lambda
+                alpha *= update_alpha
                 break
-    return Q, episode_steps, rewards
+    return Q, episode_steps, returns
 
 """
 Q(sigma, lambda) implementation for Mountain Car
@@ -210,7 +223,7 @@ def qSigmaLambdaMC(env,  n_episodes = 100, Lambda = 0, sigma = 1,
         epsilon_target = 0
     weights = np.zeros(max_size)
     episode_steps = np.zeros(n_episodes)
-    rewards = np.zeros(n_episodes)
+    returns = np.zeros(n_episodes)
     
     for i in range(n_episodes):
         done = False
@@ -284,11 +297,11 @@ def qSigmaLambdaMC(env,  n_episodes = 100, Lambda = 0, sigma = 1,
                 if printing:
                     print("Episode " + str(i + 1) + " finished after " + 
                           str(j + 1) + " time steps " + "obtaining " + 
-                          str(reward_sum) + " rewards.")
+                          str(reward_sum) + " returns.")
                 episode_steps[i] = j
-                rewards[i] = reward_sum
+                returns[i] = reward_sum
                 sigma *= update_sigma
                 Lambda *= update_lambda
                 alpha *= update_alpha
                 break
-    return weights, episode_steps, rewards
+    return weights, episode_steps, returns
