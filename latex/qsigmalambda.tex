@@ -20,8 +20,8 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\chead{Double Q($\sigma$) and Q($\sigma, \lambda$) \\ Unifying reinforcement learning control algorithms}
-\title{Double Q($\sigma$) and Q($\sigma, \lambda$) \\ Unifying reinforcement learning control algorithms}
+\chead{Double Q($\sigma$) and Q($\sigma, \lambda$) \\ Unifying Reinforcement Learning Control Algorithms}
+\title{Double Q($\sigma$) and Q($\sigma, \lambda$) \\ Unifying Reinforcement Learning Control Algorithms}
 
 \newcommand{\fix}{\marginpar{FIX}}
 \newcommand{\new}{\marginpar{NEW}}
@@ -34,9 +34,9 @@
 \maketitle
 
 \begin{abstract}
-Temporal-difference (TD) learning is an important field in reinforcement learning. The most used TD control algorithms are probably Sarsa and Q-Learning. While Sarsa is an on-policy algorithm, Q-Learning learns off-policy. The Q($\sigma$) algorithm (\cite{sutton2017}) unifies both.
+Temporal-difference (TD) learning is an important field in reinforcement learning. Sarsa and Q-Learning are among the most used TD algorithms. The Q($\sigma$) algorithm (\cite{sutton2017}) unifies both.
 This paper extends the Q($\sigma$) algorithm to an on-line multi-step algorithm Q($\sigma, \lambda$) using eligibility traces and introduces Double Q($\sigma$) as the extension of Q($\sigma$) to double learning. 
-Experiments suggest that the new Q($\sigma, \lambda$) algorithm can outperform the classical TD control methods Sarsa and Q-Learning.
+Experiments suggest that the new Q($\sigma, \lambda$) algorithm can outperform the classical TD control methods Sarsa($\lambda$), Q($\lambda$) and Q($\sigma$).
 \end{abstract}
 
 \section{Introduction}
@@ -73,13 +73,13 @@ Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \; \delta_t,
 \label{equ:update}
 \end{equation}
 
-where $Q$ is an estimate of $q_\pi$, $\alpha$ is the learning rate (also called step size) and $\delta_t$ is the TD error, the difference between our current estimate and a newly computed target value. The following TD control algorithms can all be characterized by their different form of TD error.
+where $Q$ is an estimate of $q_\pi$, $\alpha$ is the step size and $\delta_t$ is the TD error, the difference between our current estimate and a newly computed target value. The following TD control algorithms can all be characterized by their different TD errors.
 
 When the action values $Q$ are represented as a table we call this tabular reinforcement learning, else we speak of approximate reinforcement learning, e.g. when using a neural network to compute the action values. For sake of simplicity the following analysis is done for tabular reinforcement learning but can be easily extended to function approximation.
 
 \section[TD control algorithms]{TD control algorithms: From Sarsa to Q($\sigma$)}
 
-Sarsa (\cite{sarsa}) is a temporal-difference learning algorithm which samples states and actions using an epsilon-greedy policy and then updates the $Q$ values using Equation \ref{equ:update} with the following TD error 
+Sarsa (\cite{sarsa}) is a temporal-difference learning algorithm which samples states and actions using an $\epsilon$-greedy policy and then updates the $Q$ values using Equation \ref{equ:update} with the following TD error 
 
 \begin{equation} 
 \delta_t = R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t, A_t).
@@ -102,18 +102,9 @@ Expected Sarsa generalizes Q-Learning to arbitrary target policies. The TD error
 \label{equ:expectedsarsa}
 \end{equation}
 
-The current state-action pair is updated using the expectation of all subsequent action values with respect to the action value. You can easily see that Q-Learning is just a special case of Expected Sarsa if $\pi$ is the greedy policy with respect to $Q$:
+The current state-action pair is updated using the expectation of all subsequent action values with respect to the action value. Q-Learning is a special case of Expected Sarsa if $\pi$ is the greedy policy with respect to $Q$ (\cite{sutton2017}). Of course Expected Sarsa could also be used as an on-policy algorithm if the target policy is chosen to be the same as the behaviour policy (\cite{expsarsa}).
 
-\begin{equation} 
-\pi(a | s) = \begin{cases} 1 &\mbox{if } a = \argmax_a Q(s, a) \\
-0 & \mbox{otherwise} \end{cases} 
-\end{equation}
-
-Then $\sum_{a'} \pi(a' | S_{t+1}) Q(S_{t+1}, a')$ is equal to $\max_{a'} Q(S_{t+1}, a')$ because all non-greedy actions will have a probability of 0 and the sum reduces to the $Q$ value of the greedy action, which is the maximum $Q$ value.
-
-Of course Expected Sarsa could also be used as an on-policy algorithm if the target policy is chosen to be the same as the behaviour policy (\cite{expsarsa}).
-
-\cite{sutton2017} propose a new TD control algorithm called Q($\sigma$) which unifies Sarsa and Expected Sarsa. The TD target of this new algorithm is a weighted mean of the Sarsa and Expected Sarsa TD targets, where the parameter $\sigma$ controls the weighting. When $\sigma = 1$ Q($\sigma$) is equal to Sarsa, when $\sigma = 0$ Q($\sigma$) is equal to Expected Sarsa and when using $\sigma = 0$ and a greedy target policy Q($\sigma$) is equal to Q-Learning. For intermediate values of $\sigma$ new algorithms are obtained, which can have better performance (\cite{deasis2017}).
+\cite{sutton2017} propose a new TD control algorithm called Q($\sigma$) which unifies Sarsa and Expected Sarsa. The TD target of this new algorithm is a weighted mean of the Sarsa and Expected Sarsa TD targets, where the parameter $\sigma$ controls the weighting. Q(1) is equal to Sarsa and Q(0) is equal to Expected Sarsa. For intermediate values of $\sigma$ new algorithms are obtained, which can achieve better performance (\cite{deasis2017}).
 
 The TD error of Q($\sigma$) is 
 
@@ -177,7 +168,7 @@ In this paper we propose to weight the eligibility accordingly with the same fac
 \end{cases}
 \end{equation}
 
-When $\sigma = 0$ the one-step target of Q($\sigma$) is equal to the Sarsa one-step target and therefore the eligibility update reduces to the standard accumulate eligibility trace update. When $\sigma = 1$ the one-step target of Q($\sigma$) is equal to the Expected Sarsa target and accordingly the eligibility is weighted by the target policy's probability of the current action. For intermediate values of $\sigma$ the eligibility is weighted in the same way as the TD target. \cite{deasis2017} showed that a dynamic value of $\sigma$ can outperform the classical TD control algorithms Q-Learning and Sarsa. By extending this algorithm to an on-line multi-step algorithm we can make use of the good initial performance of Sarsa($\lambda$) combined with the good asymptotic performance of Q($\lambda$). In comparison to the n-step Q($\sigma$) algorithm (\cite{deasis2017}) the new Q($\sigma$, $\lambda$) algorithm can learn on-line and is therefore likely to learn faster. 
+When $\sigma = 0$ the one-step target of Q($\sigma$) is equal to the Sarsa one-step target and therefore the eligibility update reduces to the standard accumulate eligibility trace update. When $\sigma = 1$ the one-step target of Q($\sigma$) is equal to the Expected Sarsa target and accordingly the eligibility is weighted by the target policy's probability of the current action. For intermediate values of $\sigma$ the eligibility is weighted in the same way as the TD target. \cite{deasis2017} showed that n-step Q($\sigma$) with an intermediate or dynamic value of $\sigma$ can outperform Q-Learning and Sarsa. By extending this algorithm to an on-line multi-step algorithm we can make use of the good initial performance of Sarsa($\lambda$) combined with the good asymptotic performance of Q($\lambda$). In comparison to the n-step Q($\sigma$) algorithm (\cite{deasis2017}) the new Q($\sigma$, $\lambda$) algorithm can learn on-line and is therefore likely to learn faster. 
 
 Pseudocode for tabular episodic Q($\sigma, \lambda$) is given in Algorithm \ref{algorithm1}. This can be easily extended to continuing tasks and to function approximation using one eligibility per weight of the function approximator.
 
@@ -217,7 +208,7 @@ Double learning is another extension of the basic algorithms. It has been mostly
 
 Double learning can also be used with Sarsa and Expected Sarsa as proposed by \cite{ganger2016}. Using double learning these algorithms can be more robust and perform better in stochastic environments. The decoupling of action selection and action evaluation is weaker than in Double Q-Learning because the next action $A_{t+1}$ is selected according to an $\epsilon$-greedy behavior policy using $Q_A + Q_B$ and evaluated either with $Q_A$ or $Q_B$. For Expected Sarsa the policy used for the target in Equation \ref{equ:expectedsarsa} could be the $\epsilon$-greedy behavior policy as proposed by \cite{ganger2016}, but it is probably better to use a policy according to $Q_A$ (if updating $Q_A$), because then it can also be used off-policy with Double Q-Learning as a special case, if $\pi$ is the greedy policy with respect to $Q_A$.
 
-In this paper we propose the extension of double learning to Q($\sigma$) - Double Q($\sigma$) - to obtain a new algorithm with the good learning properties of double learning, which generalizes (Double) Q-Learning, (Double) Expected Sarsa and (Double) Sarsa. Of course double Q($\sigma$) can also be used with eligibility traces.
+In this paper we propose the extension of double learning to Q($\sigma$) - Double Q($\sigma$) - to obtain a new algorithm with the good learning properties of double learning, which generalizes (Double) Q-Learning, (Double) Expected Sarsa and (Double) Sarsa. Of course Double Q($\sigma$) can also be used with eligibility traces.
 
 Double Q($\sigma$) has the following TD error when $Q_A$ is selected,
 
@@ -273,16 +264,16 @@ Pseudocode for Double Q($\sigma$) is given in Algorithm 2.
 
 \section{Experiments}
 
-In this section the performance of the newly proposed Q($\sigma, \lambda$) algorithm will be tested on a gridworld navigation task compared with the performance of classical TD control algorithms like Sarsa and Q-Learning.
+In this section the performance of the newly proposed Q($\sigma, \lambda$) algorithm will be tested on a gridworld navigation task compared with the performance of classical TD control algorithms like Sarsa and Q-Learning as well as Q($\sigma$).
 
 %\subsection{Windy Gridworld}
 
 The windy gridworld is a simple navigation task described by \cite{sutton1998}. The goal is to get as fast as possible from a start state to a goal state using the actions left, right, up or down. In each column of the grid the agent is pushed upward by a wind. When an action would take the agent outside the grid, the agent is placed in the nearest cell inside the grid. The stochastic windy gridworld (\cite{deasis2017}) is a variant where state transitions are random, with a probability of 0.1 the agent will transition to one of the surrounding eight states independent of the action.
 The task is treated as an undiscounted episodic task with a reward of -1 for each transition. Figure \ref{fig:windy_gridworld} visualizes the gridworld. 
 
-Experiments were conducted using an $\epsilon$-greedy behaviour policy with $\epsilon = 0.1$. The performance in terms of the average return over the first 100 episodes was measured for different values of $\sigma$ and $\lambda$ as a function of the step size $\alpha$. For the Expected Sarsa part of the update a greedy target policy was chosen, i.e. $Q(0)$ is exactly Q-Learning. Results were averaged over 100 independent runs.
+Experiments were conducted using an $\epsilon$-greedy behaviour policy with $\epsilon = 0.1$. The performance in terms of the average return over the first 100 episodes was measured for different values of $\sigma$ and $\lambda$ as a function of the step size $\alpha$. For the Expected Sarsa part of the update a greedy target policy was chosen, i.e. $Q(0)$ is exactly Q-Learning. Results were averaged over 200 independent runs.
 
-Figure \ref{fig:windygrid_results} shows that an intermediate value of $\sigma = 0.5$ performed better than the classical Sarsa and Q-Learning algorithm. The best performance was found by dynamically varying $\sigma$ over time, i.e. decreasing $\sigma$ by a factor of 0.99 after each episode. Multi-step bootstrapping with a trace decay parameter $\lambda = 0.7$ performed better than the one-step algorithms ($\lambda = 0$). Dynamically varying the value of $\sigma$ allows to combine the good initial performance of Sarsa with the good asymptotic performance of Expected Sarsa. This confirms the results observed by \cite{deasis2017} for n-step algorithms.
+Figure \ref{fig:windygrid_results} shows that an intermediate value of $\sigma = 0.5$ performed better than Sarsa (Q(1)) and Q-Learning (Q(0)). The best performance was found by dynamically varying $\sigma$ over time, i.e. decreasing $\sigma$ by a factor of 0.99 after each episode. Multi-step bootstrapping with a trace decay parameter $\lambda = 0.7$ performed better than the one-step algorithms ($\lambda = 0$). Dynamically varying the value of $\sigma$ allows to combine the good initial performance of Sarsa with the good asymptotic performance of Expected Sarsa. This confirms the results observed by \cite{deasis2017} for n-step algorithms.
 
 \begin{figure}
 \centering
@@ -297,15 +288,15 @@ Figure \ref{fig:windygrid_results} shows that an intermediate value of $\sigma =
   \label{fig:windy_gridworld}
 \end{minipage}\hspace{0.5cm}
 \begin{minipage}[t]{.6\textwidth}
-  \caption{Stochastic windy gridworld results averaged over 100 episodes and 100 runs. Performance of Q($\sigma, \lambda$) for different values of $\sigma$ as a function of the step size $\alpha$. For the trace decay parameter $\lambda = [0, 0.7]$ were used. The best performance was found when using a dynamic value of $\sigma$ multiplying $\sigma$ with a factor 0.99 after each episode.}
+  \caption{Stochastic windy gridworld results averaged over 100 episodes and 200 independent runs. Performance of Q($\sigma, \lambda$) for different values of $\sigma$ as a function of the step size $\alpha$. For the trace decay parameter $\lambda = [0, 0.7]$ were used. The best performance was found when using a dynamic value of $\sigma$ by multiplying $\sigma$ with a factor 0.99 after each episode.}
   \label{fig:windygrid_results}
 \end{minipage}
 \end{figure}
 
 \section{Conclusions}
 
-This paper has presented two extensions to the Q($\sigma$) algorithm, which unifies Q-Learning, Expected Sarsa and Sarsa. Q($\sigma, \lambda$) extends the algorithm to an on-line multi-step algorithm using eligibility traces and Double Q($\sigma$) extends the algorithm to double learning.
-Empirical results suggest that Q($\sigma, \lambda$) can outperform classic TD control algorithms like Sarsa($\lambda$) or Q-Learning. Dynamically varying $\sigma$ obtains the best results.
+This paper has presented two extensions to the Q($\sigma$) algorithm, which unify Q-Learning, Expected Sarsa and Sarsa. Q($\sigma, \lambda$) extends the algorithm to an on-line multi-step algorithm using eligibility traces and Double Q($\sigma$) extends the algorithm to double learning.
+Empirical results suggest that Q($\sigma, \lambda$) can outperform classic TD control algorithms like Sarsa($\lambda$), Q($\lambda$) and Q($\sigma$). Dynamically varying $\sigma$ obtains the best results.
 
 Future research might focus on performance of Q($\sigma, \lambda$) when used with non-linear function approximation and different schemes to update $\sigma$ over time.
 

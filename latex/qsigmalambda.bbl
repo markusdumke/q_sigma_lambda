@@ -1,0 +1,63 @@
+\begin{thebibliography}{xx}
+
+\harvarditem[Asis et~al.]{Asis, Hernandez{-}Garcia, Holland \harvardand\
+  Sutton}{2017}{deasis2017}
+Asis, K.~D., Hernandez{-}Garcia, J.~F., Holland, G.~Z. \harvardand\ Sutton,
+  R.~S.  \harvardyearleft 2017\harvardyearright .
+\newblock Multi-step reinforcement learning: {A} unifying algorithm, {\em CoRR}
+  {\bf abs/1703.01327}.
+\newline\harvardurl{http://arxiv.org/abs/1703.01327}
+
+\harvarditem{Hasselt}{2010}{hasselt2010}
+Hasselt, H.~V.  \harvardyearleft 2010\harvardyearright .
+\newblock Double q-learning, {\em in} J.~D. Lafferty, C.~K.~I. Williams,
+  J.~Shawe-Taylor, R.~S. Zemel \harvardand\ A.~Culotta (eds), {\em Advances in
+  Neural Information Processing Systems 23}, Curran Associates, Inc.,
+  pp.~2613--2621.
+\newline\harvardurl{http://papers.nips.cc/paper/3964-double-q-learning.pdf}
+
+\harvarditem{Michael~Ganger \harvardand\ Hu}{2016}{ganger2016}
+Michael~Ganger, E.~D. \harvardand\ Hu, W.  \harvardyearleft
+  2016\harvardyearright .
+\newblock Double sarsa and double expected sarsa with shallow and deep
+  learning, {\em Journal of Data Analysis and Information Processing} {\bf
+  4}:~159--176.
+
+\harvarditem{Rummery \harvardand\ Niranjan}{1994}{sarsa}
+Rummery, G.~A. \harvardand\ Niranjan, M.  \harvardyearleft
+  1994\harvardyearright .
+\newblock On-line q-learning using connectionist systems, {\em Technical
+  report}.
+
+\harvarditem{Singh \harvardand\ Sutton}{1996}{eligibility}
+Singh, S.~P. \harvardand\ Sutton, R.~S.  \harvardyearleft 1996\harvardyearright
+  .
+\newblock Reinforcement learning with replacing eligibility traces, {\em
+  Machine Learning} {\bf 22}(1):~123--158.
+
+\harvarditem{Sutton \harvardand\ Barto}{1998}{sutton1998}
+Sutton, R.~S. \harvardand\ Barto, A.~G.  \harvardyearleft 1998\harvardyearright
+  .
+\newblock {\em Introduction to Reinforcement Learning}, 1st edn, MIT Press,
+  Cambridge, MA, USA.
+
+\harvarditem{Sutton \harvardand\ Barto}{2017}{sutton2017}
+Sutton, R.~S. \harvardand\ Barto, A.~G.  \harvardyearleft 2017\harvardyearright
+  .
+\newblock Reinforcement learning : An introduction.
+\newblock Accessed: 2017-08-01.
+
+\harvarditem[Van~Seijen et~al.]{Van~Seijen, Van~Hasselt, Whiteson \harvardand\
+  Wiering}{2009}{expsarsa}
+Van~Seijen, H., Van~Hasselt, H., Whiteson, S. \harvardand\ Wiering, M.
+  \harvardyearleft 2009\harvardyearright .
+\newblock A theoretical and empirical analysis of expected sarsa, {\em Adaptive
+  Dynamic Programming and Reinforcement Learning, 2009. ADPRL'09. IEEE
+  Symposium on}, IEEE, pp.~177--184.
+
+\harvarditem{Watkins}{1989}{watkins1989}
+Watkins, C. J. C.~H.  \harvardyearleft 1989\harvardyearright .
+\newblock {\em Learning from delayed rewards}, PhD thesis, King's College,
+  Cambridge.
+
+\end{thebibliography}
