@@ -8,4 +8,4 @@ This repository includes code for the paper:
 
 > Double Q($\sigma$) and Q($\sigma, \lambda$): Unifying Reinforcement Learning Control Algorithms
 
-It contains python implementations of Double Q($\sigma$) and Q($\sigma, \lambda$). These algorithms generalize Q-Learning, Sarsa and Q($\sigma$) and can achieve better performance. Read the paper at [arXiv]() for more information.
+It contains python implementations of Double Q($\sigma$) and Q($\sigma, \lambda$). These algorithms generalize Q-Learning, Sarsa and Q($\sigma$) and can achieve better performance. Read the paper at [arXiv](https://arxiv.org/abs/1711.01569) for more information.
